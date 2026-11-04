@@ -20,6 +20,22 @@
 - **消息通知**：点赞、收藏、评论、关注、审核结果、举报结果、活动等全站事件提醒
 - **数据仪表盘**：分类分布、发文与用户增长趋势、状态分布、热门博客 Top10 可视化（管理端）
 
+## 📸 系统预览
+
+### 前台用户端
+
+| 登录页 | 首页（分类导航 + 博客列表） |
+|:---:|:---:|
+| ![登录页](docs/screenshots/01-login.png) | ![首页](docs/screenshots/02-home.png) |
+| **博客详情（悬浮工具栏 + 作者卡）** | **个人空间（数据统计 + 文章/粉丝/关注）** |
+| ![博客详情](docs/screenshots/03-blog-detail.png) | ![个人空间](docs/screenshots/04-space.png) |
+
+### 后台管理端
+
+| 数据仪表盘 | 敏感词管理 |
+|:---:|:---:|
+| ![数据仪表盘](docs/screenshots/05-admin-dashboard.png) | ![敏感词管理](docs/screenshots/06-sensitive-word.png) |
+
 ## 🛠 技术栈
 
 | 端 | 技术 |
