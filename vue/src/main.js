@@ -14,6 +14,7 @@ Vue.config.productionTip = false
 
 Vue.prototype.$request = request
 Vue.prototype.$baseUrl = process.env.VUE_APP_BASEURL
+Vue.prototype.$bus = new Vue()   // 全局事件总线：WebSocket 私信实时推送跨组件通信
 
 Vue.use(ElementUI, {size: "small"})
 

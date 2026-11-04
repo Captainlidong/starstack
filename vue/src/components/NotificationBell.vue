@@ -7,7 +7,10 @@
     <!-- append-to-body：抽屉挂到 body 层，避免被头部毛玻璃效果的定位上下文影响导致页面假死 -->
     <el-drawer title="消息通知" :visible.sync="drawer" size="380px" :append-to-body="true">
       <div style="padding: 0 15px 20px">
-        <div style="text-align: right;margin-bottom: 8px">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px">
+          <el-button type="text" size="mini" @click="$router.push('/front/message')">
+            <i class="el-icon-chat-dot-square"></i> 查看私信
+          </el-button>
           <el-button type="text" size="mini" @click="readAll" v-if="list.length">全部已读</el-button>
         </div>
         <div v-for="n in list" :key="n.id" class="notice-item" :class="{unread: !n.isRead}" @click="clickItem(n)">
@@ -36,31 +39,130 @@ export default {
       user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
       drawer: false,
       unreadCount: 0,
+      notifUnread: 0,        // 系统通知未读（30s 轮询）
+      msgUnread: 0,          // 私信未读（WebSocket 实时维护）
       list: [],
       pageNum: 1,
       pageSize: 10,
       total: 0,
-      timer: null
+      timer: null,           // 系统通知未读兜底轮询
+      ws: null,              // WebSocket 连接
+      wsRetryTimer: null,    // 重连定时器
+      wsRetry: 0,            // 重连次数
+      wsManualClose: false   // 是否手动关闭（登出）
+    }
+  },
+  computed: {
+    isLogged() {
+      return !!this.user.id
+    }
+  },
+  watch: {
+    // 登录/登出状态变化：登录则建立 WS 连接，登出则断开
+    isLogged(logged) {
+      if (logged) {
+        this.connectWS()
+        this.startPoll()
+        this.loadUnread()
+      } else {
+        this.closeWS()
+        this.stopPoll()
+        this.unreadCount = 0
+        this.notifUnread = 0
+        this.msgUnread = 0
+      }
+    },
+    '$route.path'() {   // 路由切换时若连接异常则重试
+      if (this.isLogged && (!this.ws || this.ws.readyState > 1)) {
+        this.connectWS()
+      }
     }
   },
   mounted() {
-    this.loadUnread()
-    // 每 30 秒轮询一次未读数
-    this.timer = setInterval(this.loadUnread, 30000)
+    if (this.isLogged) {
+      this.connectWS()
+      this.startPoll()
+      this.loadUnread()
+    }
+    // 聊天页标已读后：重新拉取私信未读数（避免正看会话时角标虚高）
+    this.$bus.$on('msg:read', this.refreshMsgUnread)
   },
   beforeDestroy() {
-    if (this.timer) clearInterval(this.timer)
+    this.$bus.$off('msg:read', this.refreshMsgUnread)
+    this.stopPoll()
+    this.closeWS()
   },
   methods: {
+    // ========== WebSocket 全局连接（私信实时推送） ==========
+    connectWS() {
+      if (this.ws && (this.ws.readyState === 0 || this.ws.readyState === 1)) return
+      const proto = location.protocol === 'https:' ? 'wss://' : 'ws://'
+      this.wsManualClose = false
+      this.ws = new WebSocket(proto + location.host + '/ws/message?token=' + (this.user.token || ''))
+      this.ws.onopen = () => {
+        this.wsRetry = 0
+        this.refreshMsgUnread()          // 重连后对齐私信未读数
+        this.$bus.$emit('ws:connected')  // 通知聊天页补齐断线期间的消息
+      }
+      this.ws.onmessage = e => {
+        let data = null
+        try { data = JSON.parse(e.data) } catch (err) { return }
+        if (!data || !data.type) return
+        if (data.type === 'pong') return
+        if (data.type === 'new-message') {
+          this.msgUnread++
+          this.unreadCount = this.notifUnread + this.msgUnread
+          this.$bus.$emit('ws:new-message', data)   // 广播给聊天页（Message.vue）
+        }
+      }
+      this.ws.onclose = () => {
+        if (this.wsManualClose) return
+        // 断线 5 秒后自动重连
+        if (this.wsRetryTimer) clearTimeout(this.wsRetryTimer)
+        this.wsRetryTimer = setTimeout(() => this.connectWS(), 5000)
+      }
+      this.ws.onerror = () => {}
+    },
+    closeWS() {
+      this.wsManualClose = true
+      if (this.ws) { this.ws.close(); this.ws = null }
+      if (this.wsRetryTimer) { clearTimeout(this.wsRetryTimer); this.wsRetryTimer = null }
+    },
+    // ========== 未读数 ==========
     loadUnread() {
       if (!this.user.id) return
-      // 铃铛角标 = 系统通知未读 + 私信未读
+      // 系统通知未读（30s 兜底轮询）+ 私信未读（WS 实时增量）
       this.$request.get('/notification/unreadCount').then(res => {
-        if (res.code === '200') this.unreadCount = res.data || 0
+        if (res.code === '200') {
+          this.notifUnread = res.data || 0
+          this.unreadCount = this.notifUnread + this.msgUnread
+        }
       })
+      this.refreshMsgUnread()
+    },
+    refreshMsgUnread() {
+      if (!this.user.id) return
       this.$request.get('/message/unreadCount').then(res => {
-        if (res.code === '200') this.unreadCount += res.data || 0
+        if (res.code === '200') {
+          this.msgUnread = res.data || 0
+          this.unreadCount = this.notifUnread + this.msgUnread
+        }
       })
+    },
+    onWsNewMessage() {   // 收到实时私信推送：角标 +1
+      this.msgUnread++
+      this.unreadCount = this.notifUnread + this.msgUnread
+    },
+    onWsConnected() {   // WS 重连成功：对齐私信未读数
+      this.refreshMsgUnread()
+    },
+    startPoll() {
+      this.timer = setInterval(() => {
+        if (this.user.id) this.loadUnread()
+      }, 30000)
+    },
+    stopPoll() {
+      if (this.timer) { clearInterval(this.timer); this.timer = null }
     },
     open() {
       this.drawer = true

@@ -16,7 +16,7 @@ CREATE TABLE `message` (
   PRIMARY KEY (`id`),
   KEY `idx_msg_sender` (`sender_id`),
   KEY `idx_msg_receiver` (`receiver_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='私信表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='私信表';
 
 -- 2. 问答表（一问一答）
 CREATE TABLE `question` (
@@ -32,4 +32,8 @@ CREATE TABLE `question` (
   PRIMARY KEY (`id`),
   KEY `idx_question_author` (`author_id`),
   KEY `idx_question_asker` (`asker_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='问答表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='问答表';
+
+-- 3. 字符集升级（若表已按 utf8 建过，转为 utf8mb4 以支持 emoji 等四字节字符）
+ALTER TABLE `message` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE `question` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

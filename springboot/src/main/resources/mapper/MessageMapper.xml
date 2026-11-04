@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.mapper.MessageMapper">
 
-    <insert id="insert">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         insert into message (sender_id, receiver_id, content, is_read, time)
         values (#{senderId}, #{receiverId}, #{content}, 0, #{time})
     </insert>

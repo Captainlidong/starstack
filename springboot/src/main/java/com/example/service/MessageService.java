@@ -7,6 +7,7 @@ import com.example.entity.Account;
 import com.example.entity.Message;
 import com.example.entity.User;
 import com.example.exception.CustomException;
+import com.example.handler.MessageWebSocketHandler;
 import com.example.mapper.MessageMapper;
 import com.example.mapper.UserMapper;
 import com.example.utils.TokenUtils;
@@ -33,6 +34,9 @@ public class MessageService {
     @Resource
     private SensitiveWordService sensitiveWordService;
 
+    @Resource
+    private MessageWebSocketHandler messageWebSocketHandler;
+
     /** 发送私信（内容敏感词拦截，不能发给自己） */
     public void send(Integer receiverId, String content) {
         Account current = TokenUtils.getCurrentUser();
@@ -52,6 +56,23 @@ public class MessageService {
         m.setContent(content.trim());
         m.setTime(DateUtil.now());
         messageMapper.insert(m);
+        // 落库成功后，若接收者 WebSocket 在线，实时推送新消息提醒
+        try {
+            String senderName = StrUtil.blankToDefault(current.getName(), current.getUsername());
+            cn.hutool.json.JSONObject payload = new cn.hutool.json.JSONObject();
+            cn.hutool.json.JSONObject msg = new cn.hutool.json.JSONObject();
+            msg.set("id", m.getId());
+            msg.set("senderId", m.getSenderId());
+            msg.set("receiverId", m.getReceiverId());
+            msg.set("content", m.getContent());
+            msg.set("time", m.getTime());
+            payload.set("type", "new-message");
+            payload.set("message", msg);
+            payload.set("senderName", senderName);
+            messageWebSocketHandler.pushToUser(receiverId, payload.toString());
+        } catch (Exception e) {
+            // 实时推送失败不影响消息落库，接收者重连后可拉取
+        }
     }
 
     /**

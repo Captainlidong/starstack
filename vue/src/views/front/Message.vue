@@ -106,20 +106,51 @@ export default {
     this.loadConversations()
     // URL 指定了私信对象：自动打开该会话
     if (this.activeId) this.openConversation(this.activeId)
-    // 轮询：当前会话新消息 + 会话列表未读
-    this.pollTimer = setInterval(() => {
-      this.refreshActive()
-      this.loadConversations(true)
-    }, 5000)
+    // 监听全局 WebSocket 实时推送（NotificationBell 全局连接）
+    this.$bus.$on('ws:new-message', this.onWsMessage)
+    this.$bus.$on('ws:connected', this.onWsConnected)
   },
   beforeDestroy() {
-    if (this.pollTimer) clearInterval(this.pollTimer)
+    this.$bus.$off('ws:new-message', this.onWsMessage)
+    this.$bus.$off('ws:connected', this.onWsConnected)
   },
   methods: {
+    // WebSocket 实时推送到达：接收者是当前会话则直接追加气泡，否则仅更新会话列表
+    onWsMessage(data) {
+      const msg = data.message
+      if (!msg) return
+      if (msg.senderId === this.activeId) {
+        // 正在看这个会话：追加气泡并标记已读
+        if (!this.historyRaw.some(m => m.id === msg.id)) {
+          this.historyRaw.push({
+            id: msg.id, senderId: msg.senderId, receiverId: msg.receiverId,
+            content: msg.content, isRead: 0, time: msg.time
+          })
+          this.$request.put('/message/read/' + this.activeId).then(() => {
+            // 已读生效后同步清掉会话列表角标，并让铃铛未读数对齐
+            const conv = this.conversations.find(c => c.otherId === this.activeId)
+            if (conv) conv.unreadCount = 0
+            this.$bus.$emit('msg:read')
+          })
+          this.$nextTick(() => {
+            const body = this.$refs.chatBody
+            if (body) body.scrollTop = body.scrollHeight
+          })
+        }
+      }
+      this.loadConversations(true)   // 更新会话列表最后一条/角标
+    },
+    // WebSocket 重连成功：补齐断线期间的消息
+    onWsConnected() {
+      if (this.activeId) this.loadHistory()
+    },
     loadConversations(silent) {
       this.$request.get('/message/conversations').then(res => {
         if (res.code === '200') {
           this.conversations = res.data || []
+          // 正在查看的会话必然已读：修正响应竞态导致的角标残留
+          const conv = this.conversations.find(c => c.otherId === this.activeId)
+          if (conv) conv.unreadCount = 0
         }
       })
     },
@@ -156,23 +187,6 @@ export default {
         }
       })
     },
-    refreshActive() {   // 轮询当前会话新消息（接口第一条=最新消息id，与本地对比判断是否有新消息）
-      if (!this.activeId) return
-      this.$request.get('/message/history/' + this.activeId).then(res => {
-        if (res.code === '200') {
-          const latest = res.data || []
-          const latestId = latest.length ? latest[0].id : 0
-          const localLatestId = this.historyRaw.length ? this.historyRaw[0].id : 0
-          if (latestId !== localLatestId) {
-            this.historyRaw = latest
-            this.$nextTick(() => {
-              const body = this.$refs.chatBody
-              if (body) body.scrollTop = body.scrollHeight
-            })
-          }
-        }
-      })
-    },
     onEnter(e) {
       if (!e.shiftKey) {   // Enter 发送，Shift+Enter 换行
         e.preventDefault()
@@ -191,7 +205,8 @@ export default {
       }).then(res => {
         if (res.code === '200') {
           this.inputText = ''
-          this.refreshActive()
+          // 实时消息由 WebSocket 推送到达；此处主动拉取一次确保多端一致
+          this.loadHistory()
           this.loadConversations(true)
         } else {
           this.$message.error(res.msg)
