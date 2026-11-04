@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.SensitiveWordMapper">
+
+    <select id="selectAllWords" resultType="java.lang.String">
+        select word from sensitive_word
+    </select>
+
+    <select id="selectAll" resultType="com.example.entity.SensitiveWord">
+        select * from sensitive_word order by id desc
+    </select>
+
+    <insert id="insert">
+        insert into sensitive_word (word) values (#{word})
+    </insert>
+
+    <select id="selectByWord" resultType="com.example.entity.SensitiveWord">
+        select * from sensitive_word where word = #{word}
+    </select>
+
+    <delete id="deleteById">
+        delete from sensitive_word where id = #{id}
+    </delete>
+
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.DashboardMapper">
+
+    <select id="countUsers" resultType="java.lang.Integer">
+        select count(*) from user
+    </select>
+
+    <select id="countUsersToday" resultType="java.lang.Integer">
+        select count(*) from user where create_time like concat(#{today}, '%')
+    </select>
+
+    <select id="countBlogs" resultType="java.lang.Integer">
+        select count(*) from blog
+    </select>
+
+    <select id="sumReads" resultType="java.lang.Integer">
+        select ifnull(sum(read_count), 0) from blog
+    </select>
+
+    <select id="countComments" resultType="java.lang.Integer">
+        select count(*) from `comment`
+    </select>
+
+    <select id="countActivities" resultType="java.lang.Integer">
+        select count(*) from activity
+    </select>
+
+    <select id="countSigns" resultType="java.lang.Integer">
+        select count(*) from activity_sign
+    </select>
+
+    <select id="countLikes" resultType="java.lang.Integer">
+        select count(*) from likes
+    </select>
+
+    <select id="countCollects" resultType="java.lang.Integer">
+        select count(*) from collect
+    </select>
+
+    <select id="countFollows" resultType="java.lang.Integer">
+        select count(*) from follow
+    </select>
+
+    <select id="countBlogsByStatus" resultType="java.lang.Integer">
+        select count(*) from blog where status = #{status}
+    </select>
+
+    <select id="countPendingReports" resultType="java.lang.Integer">
+        select count(*) from report where status = 'PENDING'
+    </select>
+
+    <select id="selectCategoryDistribution" resultType="java.util.HashMap">
+        select c.name as name, count(b.id) as value
+        from category c
+        left join blog b on b.category_id = c.id and b.status = 'PUBLISHED' and b.visibility = 'PUBLIC'
+        group by c.id, c.name
+        order by value desc
+    </select>
+
+    <select id="selectBlogTrend" resultType="java.util.HashMap">
+        select date as name, count(*) as value
+        from blog
+        where status = 'PUBLISHED' and date >= #{startDate}
+        group by date
+    </select>
+
+    <select id="selectUserTrend" resultType="java.util.HashMap">
+        select date(create_time) as name, count(*) as value
+        from user
+        where create_time is not null and create_time >= #{startDate}
+        group by date(create_time)
+    </select>
+
+    <select id="selectHotBlogs" resultType="java.util.HashMap">
+        select title as name, read_count as value
+        from blog
+        where status = 'PUBLISHED' and visibility = 'PUBLIC'
+        order by read_count desc
+        limit 10
+    </select>
+
+    <select id="selectLatestPendingBlogs" resultType="java.util.HashMap">
+        select b.id, b.title, u.name as userName, b.date
+        from blog b
+        left join user u on b.user_id = u.id
+        where b.status = 'PENDING'
+        order by b.id desc
+        limit 5
+    </select>
+
+</mapper>

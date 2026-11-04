@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mapper.UserBehaviorMapper">
+    <select id="getByUserId" resultType="com.example.entity.UserBehavior">
+        SELECT * FROM user_behavior WHERE user_id = #{userId}
+    </select>
+
+    <select id="getAllBehaviors" resultType="com.example.entity.UserBehavior">
+        SELECT * FROM user_behavior
+    </select>
+
+    <insert id="insert">
+        INSERT INTO user_behavior(user_id, blog_id, behavior_type, weight, `timestamp`)
+        VALUES (#{userId}, #{blogId}, #{behaviorType}, #{weight}, now())
+    </insert>
+
+    <select id="selectOne" resultType="com.example.entity.UserBehavior">
+        SELECT * FROM user_behavior
+        WHERE user_id = #{userId} AND blog_id = #{blogId} AND behavior_type = #{behaviorType}
+        LIMIT 1
+    </select>
+
+    <update id="updateTimestamp">
+        UPDATE user_behavior SET `timestamp` = now() WHERE id = #{id}
+    </update>
+
+    <delete id="deleteBehavior">
+        DELETE FROM user_behavior
+        WHERE user_id = #{userId} AND blog_id = #{blogId} AND behavior_type = #{behaviorType}
+    </delete>
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CategoryMapper">
+
+    <sql id="Base_Column_List">
+        id,name
+    </sql>
+
+<!--新增-->
+    <insert id="insert" parameterType="com.example.entity.Category" useGeneratedKeys="true" keyProperty="id">
+        insert into category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">id,</if>
+            <if test="name!=null">name,</if>
+        </trim>
+
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id!=null">#{id},</if>
+            <if test="name!=null">#{name},</if>
+        </trim>
+    </insert>
+
+    <!--删除-->
+    <delete id="deleteById">
+        delete from category where id = #{id}
+    </delete>
+
+    <!--修改-->
+    <update id="updateById" parameterType="com.example.entity.Category">
+        update category
+            <set>
+                <if test="name!=null">
+                    name=#{name}
+                </if>
+            </set>
+        where id = #{id}
+    </update>
+
+    <!--根据ID进行查询-->
+    <select id="selectById" resultType="com.example.entity.Category">
+        select
+        <include refid="Base_Column_List" />   /*引用了名为"Base_Column_List"的另一个映射文件或者同一映射文件中的某个SQL片段。这样可以将通用的字段列表包含到当前的查询语句中。*/
+        from category where id = #{id}
+    </select>
+
+    <!--查询所有-->
+    <select id="selectAll" resultType="com.example.entity.Category">
+        select
+            <include refid="Base_Column_List"/>
+        from category
+            <where>
+                <if test="id != null">and id=#{id}</if>
+                <if test="name != null">and name like concat('%',#{name},'%')</if>
+            </where>
+    </select>
+
+</mapper>

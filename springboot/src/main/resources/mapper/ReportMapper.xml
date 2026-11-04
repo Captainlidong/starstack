@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ReportMapper">
+
+    <insert id="insert">
+        insert into report (reporter_id, target_type, target_id, reason, status, time)
+        values (#{reporterId}, #{targetType}, #{targetId}, #{reason}, #{status}, #{time})
+    </insert>
+
+    <select id="selectByReporterAndTarget" resultType="com.example.entity.Report">
+        select * from report
+        where reporter_id = #{reporterId} and target_type = #{targetType} and target_id = #{targetId}
+        order by id desc limit 1
+    </select>
+
+    <select id="selectPage" resultType="com.example.entity.Report">
+        select r.*,
+               u.name as reporterName,
+               case r.target_type
+                   when 'BLOG' then b.title
+                   when 'ACTIVITY' then a.name
+               end as targetTitle
+        from report r
+        left join user u on r.reporter_id = u.id
+        left join blog b on r.target_type = 'BLOG' and r.target_id = b.id
+        left join activity a on r.target_type = 'ACTIVITY' and r.target_id = a.id
+        <where>
+            <if test="status != null and status != ''">r.status = #{status}</if>
+        </where>
+        order by r.id desc
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.Report">
+        select * from report where id = #{id}
+    </select>
+
+    <update id="updateById">
+        update report
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="result != null">result = #{result},</if>
+            <if test="handleTime != null">handle_time = #{handleTime},</if>
+            <if test="adminName != null">admin_name = #{adminName},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

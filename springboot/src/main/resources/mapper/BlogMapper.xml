@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.BlogMapper">
+
+    <sql id="Base_Column_List">
+        id
+        ,title,content,descr,cover,tags,user_id,date,read_count,category_id
+    </sql>
+
+    <!--新增-->
+    <insert id="insert" parameterType="com.example.entity.Blog" useGeneratedKeys="true" keyProperty="id">
+        insert into blog
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="title != null">title,</if>
+            <if test="content != null">content,</if>
+            <if test="descr != null">descr,</if>
+            <if test="cover != null">cover,</if>
+            <if test="tags != null">tags,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="date != null">date,</if>
+            <if test="readCount != null">read_count,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="visibility != null">visibility,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="title != null">#{title},</if>
+            <if test="content != null">#{content},</if>
+            <if test="descr != null">#{descr},</if>
+            <if test="cover != null">#{cover},</if>
+            <if test="tags != null">#{tags},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="date != null">#{date},</if>
+            <if test="readCount != null">#{readCount},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="visibility != null">#{visibility},</if>
+            <if test="status != null">#{status},</if>
+        </trim>
+    </insert>
+
+    <!--删除-->
+    <delete id="deleteById">
+        delete from blog where id = #{id}
+    </delete>
+
+    <!--修改-->
+    <update id="updateById" parameterType="com.example.entity.Blog">
+        update blog
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="descr != null">
+                descr = #{descr},
+            </if>
+            <if test="cover != null">
+                cover = #{cover},
+            </if>
+            <if test="tags != null">
+                tags = #{tags},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="date != null">
+                date = #{date},
+            </if>
+            <if test="readCount != null">
+                read_count = #{readCount},
+            </if>
+            <if test="categoryId != null">
+                category_id = #{categoryId},
+            </if>
+            <if test="visibility != null">
+                visibility = #{visibility},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="rejectReason != null">
+                reject_reason = #{rejectReason},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--根据ID查询-->
+    <select id="selectById" resultType="com.example.entity.Blog">
+        select blog.* ,
+               category.name as categoryName,
+               user.name as userName,
+               user.avatar as userAvatar
+        from blog
+                 left join category
+                           on blog.category_id = category.id
+                 left join user
+                           on blog.user_id = user.id
+        where blog.id=#{id}
+    </select>
+
+    <!--查询所有-->
+    <select id="selectAll" resultType="com.example.entity.Blog">
+        select blog.* ,
+        category.name as categoryName,
+        user.name as userName,
+        user.avatar as userAvatar
+        from blog
+        left join category
+        on blog.category_id = category.id
+        left join user
+        on blog.user_id = user.id
+        <where>
+            <if test="title != null">and blog.title like concat('%',#{title},'%')</if>
+            <if test="categoryName!= null">and category.name like concat('%',#{categoryName},'%')</if>
+            <if test="userName != null">and user.name like concat('%',#{userName},'%')</if>
+            <if test="userId != null">and user.id =#{userId} </if>
+            <if test="status != null">and blog.status = #{status}</if>
+            <!-- 查询范围：all=管理端全量 own=本人全部（配合userId） 默认/公开视角=仅已发布且公开 -->
+            <choose>
+                <when test="scope == 'all' or scope == 'own'"></when>
+                <otherwise>and blog.status = 'PUBLISHED' and blog.visibility = 'PUBLIC'</otherwise>
+            </choose>
+        </where>
+        <!-- 排序：置顶的博客始终排在最前；sort 由前端切换 综合composite/最新date/最热reads/点赞最多likes
+             综合分 = 阅读量 + 点赞×5 + 收藏×10 + 评论×3 -->
+        <choose>
+            <when test="sort == 'composite'">
+                order by blog.top desc,
+                ( blog.read_count
+                + (select count(*) from likes where likes.fid = blog.id and likes.module = '博客') * 5
+                + (select count(*) from collect where collect.fid = blog.id and collect.module = '博客') * 10
+                + (select count(*) from `comment` where `comment`.fid = blog.id and `comment`.module = '博客') * 3
+                ) desc, blog.date desc
+            </when>
+            <when test="sort == 'reads'">
+                order by blog.top desc, blog.read_count desc, blog.date desc
+            </when>
+            <when test="sort == 'likes'">
+                order by blog.top desc, (select count(*) from likes where likes.fid = blog.id and likes.module = '博客') desc, blog.date desc
+            </when>
+            <otherwise>
+                order by blog.top desc, blog.date desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <!--置顶/取消置顶-->
+    <update id="setTop">
+        update blog set top = #{top} where id = #{id}
+    </update>
+
+    <!--热榜：按综合热度分（阅读量 + 点赞×5 + 收藏×10 + 评论×3）做时间衰减后取前20，与首页综合排序同口径
+        衰减公式：综合分 ÷ (发布距今天数 + 2)，越新的文章加成越高，经典老文仍可凭高互动留在榜上-->
+    <select id="selectHot" resultType="com.example.entity.Blog">
+        select blog.* ,
+        category.name as categoryName,
+        user.name as userName,
+        user.avatar as userAvatar
+        from blog
+        left join category
+        on blog.category_id = category.id
+        left join user
+        on blog.user_id = user.id
+        where blog.status = 'PUBLISHED' and blog.visibility = 'PUBLIC'
+        order by ( blog.read_count
+        + (select count(*) from likes where likes.fid = blog.id and likes.module = '博客') * 5
+        + (select count(*) from collect where collect.fid = blog.id and collect.module = '博客') * 10
+        + (select count(*) from `comment` where `comment`.fid = blog.id and `comment`.module = '博客') * 3
+        ) / GREATEST(DATEDIFF(NOW(), STR_TO_DATE(blog.date, '%Y-%m-%d')) + 2, 1) desc
+        limit 20
+    </select>
+
+    <!--个人空间：用户公开已发布的博客（按日期倒序）-->
+    <select id="selectSpaceBlogs" resultType="com.example.entity.Blog">
+        select blog.* ,
+        category.name as categoryName,
+        user.name as userName,
+        user.avatar as userAvatar
+        from blog
+        left join category
+        on blog.category_id = category.id
+        left join user
+        on blog.user_id = user.id
+        where blog.user_id = #{userId}
+          and blog.status = 'PUBLISHED'
+          and blog.visibility = 'PUBLIC'
+        order by blog.date desc
+    </select>
+
+    <!--分页查询 用户点赞的博客-->
+    <select id="selectUserLike" resultType="com.example.entity.Blog">
+        select blog.* , user.name as userName, user.avatar as userAvatar
+        from likes
+        left join blog
+        on likes.fid = blog.id
+        left join category
+        on blog.category_id = category.id
+        left join user
+        on blog.user_id = user.id
+        <where>
+            and likes.module = '博客'
+            <if test="title != null">and blog.title like concat('%',#{title},'%')</if>
+            <if test="categoryName!= null">and category.name like concat('%',#{categoryName},'%')</if>
+            <if test="userName != null">and user.name like concat('%',#{userName},'%')</if>
+            <if test="userId != null">and likes.user_id = #{userId} </if>
+        </where>
+    </select>
+
+    <!--分页查询 用户收藏的博客-->
+    <select id="selectUserCollect" resultType="com.example.entity.Blog">
+        select blog.* , user.name as userName, user.avatar as userAvatar
+        from collect
+        left join blog
+        on collect.fid = blog.id
+        left join category
+        on blog.category_id = category.id
+        left join user
+        on blog.user_id = user.id
+        <where>
+            and collect.module = '博客'
+            <if test="title != null">and blog.title like concat('%',#{title},'%')</if>
+            <if test="categoryName!= null">and category.name like concat('%',#{categoryName},'%')</if>
+            <if test="userName != null">and user.name like concat('%',#{userName},'%')</if>
+            <if test="userId != null">and collect.user_id = #{userId} </if>
+        </where>
+        order by date desc
+    </select>
+
+    <!--分页查询 用户评论的博客  去重-->
+    <select id="selectUserComment" resultType="com.example.entity.Blog">
+        select blog.* , user.name as userName, user.avatar as userAvatar
+        from comment
+        left join blog
+        on comment.fid = blog.id
+        left join category
+        on blog.category_id = category.id
+        left join user
+        on blog.user_id = user.id
+        <where>
+            and comment.module = '博客'
+            <if test="title != null">and blog.title like concat('%',#{title},'%')</if>
+            <if test="categoryName!= null">and category.name like concat('%',#{categoryName},'%')</if>
+            <if test="userName != null">and user.name like concat('%',#{userName},'%')</if>
+            <if test="userId != null">and comment.user_id = #{userId} </if>
+        </where>
+        group by comment.fid , comment.module
+        order by date desc
+    </select>
+</mapper>

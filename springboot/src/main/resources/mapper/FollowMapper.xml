@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.FollowMapper">
+
+    <insert id="insert">
+        insert into follow (user_id, follower_id, time) values (#{userId}, #{followerId}, #{time})
+    </insert>
+
+    <delete id="delete">
+        delete from follow where user_id = #{userId} and follower_id = #{followerId}
+    </delete>
+
+    <select id="selectByUserAndFollower" resultType="com.example.entity.Follow">
+        select * from follow where user_id = #{userId} and follower_id = #{followerId}
+    </select>
+
+    <select id="selectFans" resultType="com.example.entity.User">
+        select u.id, u.username, u.name, u.avatar, u.info,
+               (select count(*) from follow f2 where f2.user_id = u.id and f2.follower_id = #{currentUserId}) as isFollowed
+        from follow f
+        left join user u on f.follower_id = u.id
+        where f.user_id = #{userId}
+        order by f.id desc
+    </select>
+
+    <select id="selectFollowing" resultType="com.example.entity.User">
+        select u.id, u.username, u.name, u.avatar, u.info,
+               (select count(*) from follow f2 where f2.user_id = u.id and f2.follower_id = #{currentUserId}) as isFollowed
+        from follow f
+        left join user u on f.user_id = u.id
+        where f.follower_id = #{userId}
+        order by f.id desc
+    </select>
+
+    <select id="countFans" resultType="java.lang.Integer">
+        select count(*) from follow where user_id = #{userId}
+    </select>
+
+    <select id="countFollowing" resultType="java.lang.Integer">
+        select count(*) from follow where follower_id = #{userId}
+    </select>
+
+</mapper>

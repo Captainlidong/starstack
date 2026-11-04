@@ -1,0 +1,3 @@
+@echo off
+echo 打开 IT技术交流博客系统...
+start "" http://localhost:9090

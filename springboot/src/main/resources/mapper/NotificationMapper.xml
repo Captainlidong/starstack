@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.NotificationMapper">
+
+    <insert id="insert">
+        insert into notification (user_id, type, title, content, target_id, is_read, time)
+        values (#{userId}, #{type}, #{title}, #{content}, #{targetId}, 0, #{time})
+    </insert>
+
+    <select id="selectByUserId" resultType="com.example.entity.Notification">
+        select * from notification where user_id = #{userId} order by id desc
+    </select>
+
+    <select id="unreadCount" resultType="java.lang.Integer">
+        select count(*) from notification where user_id = #{userId} and is_read = 0
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.Notification">
+        select * from notification where id = #{id}
+    </select>
+
+    <update id="readById">
+        update notification set is_read = 1 where id = #{id}
+    </update>
+
+    <update id="readAll">
+        update notification set is_read = 1 where user_id = #{userId} and is_read = 0
+    </update>
+
+</mapper>

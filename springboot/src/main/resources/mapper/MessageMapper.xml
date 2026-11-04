@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.MessageMapper">
+
+    <insert id="insert">
+        insert into message (sender_id, receiver_id, content, is_read, time)
+        values (#{senderId}, #{receiverId}, #{content}, 0, #{time})
+    </insert>
+
+    <!--聊天记录：最近 50 条倒序-->
+    <select id="selectHistory" resultType="com.example.entity.Message">
+        select * from message
+        where (sender_id = #{me} and receiver_id = #{other})
+           or (sender_id = #{other} and receiver_id = #{me})
+        order by id desc
+        limit 50
+    </select>
+
+    <update id="markRead">
+        update message set is_read = 1
+        where sender_id = #{other} and receiver_id = #{me} and is_read = 0
+    </update>
+
+    <select id="unreadCount" resultType="java.lang.Integer">
+        select count(*) from message where receiver_id = #{me} and is_read = 0
+    </select>
+
+    <!--会话对聚合：对方ID、最后一条消息ID、未读数-->
+    <select id="selectConversationPairs" resultType="java.util.HashMap">
+        select t.other_id as otherId, max(t.id) as lastId, sum(t.unread) as unreadCount
+        from (
+            select case when sender_id = #{me} then receiver_id else sender_id end as other_id,
+                   id,
+                   if(receiver_id = #{me} and is_read = 0, 1, 0) as unread
+            from message
+            where sender_id = #{me} or receiver_id = #{me}
+        ) t
+        group by t.other_id
+        order by lastId desc
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.Message">
+        select * from message where id = #{id}
+    </select>
+
+</mapper>

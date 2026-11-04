@@ -1,0 +1,38 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Java / Spring Boot
+**/target/
+*.jar
+*.war
+
+# Node / Vue
+**/node_modules/
+**/dist/
+npm-debug.log*
+
+# 环境与密钥（按需保留，避免泄露密码）
+**/application-dev.yml
+**/application-prod.yml
+**/application-local.yml
+*.env
+start-backend.local.bat
+
+# 前端打包产物嵌入后端（由 build-all.bat 生成，不入库）
+springboot/src/main/resources/static/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 演示数据生成产物（可由 scripts/seed 重新生成）
+scripts/seed/xm-blog-seed.sql
+scripts/seed/gen.log
+scripts/seed/__pycache__/
+
+# 用户上传文件（运行时生成）
+files/
+# 论文目录（不入开源仓库）
+thesis/
