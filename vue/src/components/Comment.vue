@@ -12,7 +12,7 @@
 
     <div>
       <div style="display: flex;grid-gap: 20px;margin-bottom: 20px" v-for="item in commentList" :key="item.id">
-        <img :src="item.userAvatar" alt="" style="width: 50px;height: 50px;border-radius: 50%">
+        <img :src="$thumb(item.userAvatar)" loading="lazy" alt="" style="width: 50px;height: 50px;border-radius: 50%">
         <div style="flex: 1">
           <!--第一级评论-->
           <div style="margin-bottom: 10px">
@@ -32,7 +32,7 @@
 
           <!--这是回复-->
           <div style="display: flex;grid-gap: 20px;margin-bottom: 20px" v-for="sub in item.children" :key="sub.id">
-            <img :src="sub.userAvatar" alt="" style="width: 50px;height: 50px;border-radius: 50%">
+            <img :src="$thumb(sub.userAvatar)" loading="lazy" alt="" style="width: 50px;height: 50px;border-radius: 50%">
             <div style="flex: 1">
               <div style="color: #777888;margin-bottom: 10px">
                 {{sub.userName}}

@@ -6,7 +6,7 @@
 
       <!-- 被提问作者信息卡 -->
       <div class="ask-author" v-if="author.id">
-        <img :src="author.avatar" alt="" style="width: 46px; height: 46px; border-radius: 50%; object-fit: cover">
+        <img :src="$thumb(author.avatar)" loading="lazy" alt="" style="width: 46px; height: 46px; border-radius: 50%; object-fit: cover">
         <div>
           <div style="font-weight: bold">{{ author.name || author.username }}</div>
           <div style="font-size: 12px; color: #999999">@{{ author.username }}</div>

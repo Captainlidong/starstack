@@ -324,6 +324,12 @@ export default {
         this.blog = res.data || {}
         this.tagsArr = JSON.parse(this.blog.tags || '[]')
         this.loadFollowState()
+        // 正文内嵌图片原生懒加载：视口外的图滚动到才加载，降低详情页首屏带宽
+        this.$nextTick(() => {
+          this.$el.querySelectorAll('.blog-content img, [v-html] img, .main-content img').forEach(img => {
+            img.setAttribute('loading', 'lazy')
+          })
+        })
       })
 
       // 评论数（悬浮工具栏角标）

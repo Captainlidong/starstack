@@ -15,6 +15,8 @@ import com.example.service.SensitiveWordService;
 import com.example.utils.TokenUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -78,6 +80,7 @@ public class BlogService {
      * 新增
      * @param blog
      */
+    @CacheEvict(value = "blogTop", allEntries = true)
     public void add(Blog blog) {
         //设置发布日期为当前日期
         blog.setDate(DateUtil.today());
@@ -95,6 +98,7 @@ public class BlogService {
      * 删除（作者本人或管理员）
      * @param id
      */
+    @CacheEvict(value = "blogTop", allEntries = true)
     public void deleteById(Integer id, Account currentUser) {
         checkOwner(id, currentUser);
         blogMapper.deleteById(id);
@@ -104,6 +108,7 @@ public class BlogService {
      * 批量删除（作者本人或管理员）
      * @param ids
      */
+    @CacheEvict(value = "blogTop", allEntries = true)
     public void deleteBatch(List<Integer> ids, Account currentUser) {
         for (Integer id : ids) {
             checkOwner(id, currentUser);
@@ -126,6 +131,7 @@ public class BlogService {
      * 修改
      * @param blog
      */
+    @CacheEvict(value = "blogTop", allEntries = true)
     public void updateById(Blog blog) {
         Account currentUser = TokenUtils.getCurrentUser();
         applyStatus(blog, currentUser);
@@ -135,6 +141,7 @@ public class BlogService {
     /**
      * 管理员审核：pass=true 通过发布；false 驳回并记录原因（同时通知作者）
      */
+    @CacheEvict(value = "blogTop", allEntries = true)
     public void audit(Integer id, boolean pass, String reason, Account current) {
         Blog blog = blogMapper.selectById(id);
         if (blog == null) {
@@ -230,6 +237,7 @@ public class BlogService {
      * @param id   博客ID
      * @param top  1置顶 0取消
      */
+    @CacheEvict(value = "blogTop", allEntries = true)
     public void setTop(Integer id, Integer top) {
         blogMapper.setTop(id, top);
     }
@@ -239,6 +247,7 @@ public class BlogService {
      * 与首页综合排序同口径，高互动的新文章也能上榜
      * @return
      */
+    @Cacheable(value = "blogTop", key = "'all'")
     public List<Blog> selectTop() {
         return blogMapper.selectHot();
     }

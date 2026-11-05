@@ -71,7 +71,7 @@
         <div style="margin-bottom: 10px">
           <div v-for="item in topActivityList" :key="item.id" style="margin-bottom: 10px">
             <a :href="'/front/activityDetail?activityId='+item.id" target="_blank">
-              <img :src="item.cover" alt="" style="width:100%;border-radius: 5px">
+              <img :src="$thumb(item.cover)" loading="lazy" alt="" style="width:100%;border-radius: 5px">
             </a>
           </div>
         </div>

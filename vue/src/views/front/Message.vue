@@ -9,7 +9,7 @@
         <div v-for="c in conversations" :key="c.otherId" class="conv-item"
              :class="{active: c.otherId === Number(activeId)}" @click="openConversation(c.otherId)">
           <div style="position: relative; flex-shrink: 0">
-            <img class="conv-avatar" :src="c.otherAvatar" alt="">
+            <img class="conv-avatar" :src="$thumb(c.otherAvatar)" loading="lazy" alt="">
             <span v-if="c.unreadCount > 0" class="conv-badge">{{ c.unreadCount > 99 ? '99+' : c.unreadCount }}</span>
           </div>
           <div style="flex: 1; min-width: 0">

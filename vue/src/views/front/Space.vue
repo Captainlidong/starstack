@@ -4,7 +4,7 @@
 
     <!-- 头部卡片 -->
     <div class="card space-header" v-loading="loading">
-      <img class="space-avatar" :src="user.avatar" alt="">
+      <img class="space-avatar" :src="$thumb(user.avatar)" alt="">
       <div class="space-info">
         <div class="space-name">
           {{ user.name || user.username }}
@@ -54,7 +54,7 @@
           <span slot="label">粉丝 <span class="tab-count">{{ fansCount }}</span></span>
           <div v-if="activeTab==='fans'" v-loading="listLoading">
             <div v-for="u in userList" :key="u.id" class="user-item">
-              <img class="user-avatar" :src="u.avatar" @click="goSpace(u.id)" alt="">
+              <img class="user-avatar" :src="$thumb(u.avatar)" loading="lazy" @click="goSpace(u.id)" alt="">
               <div class="user-meta" @click="goSpace(u.id)">
                 <div class="user-nickname">{{ u.name || u.username }}</div>
                 <div class="user-bio">{{ u.info || '这个人很懒，什么都没有写' }}</div>
@@ -77,7 +77,7 @@
           <span slot="label">关注 <span class="tab-count">{{ followCount }}</span></span>
           <div v-if="activeTab==='following'" v-loading="listLoading">
             <div v-for="u in userList" :key="u.id" class="user-item">
-              <img class="user-avatar" :src="u.avatar" @click="goSpace(u.id)" alt="">
+              <img class="user-avatar" :src="$thumb(u.avatar)" loading="lazy" @click="goSpace(u.id)" alt="">
               <div class="user-meta" @click="goSpace(u.id)">
                 <div class="user-nickname">{{ u.name || u.username }}</div>
                 <div class="user-bio">{{ u.info || '这个人很懒，什么都没有写' }}</div>

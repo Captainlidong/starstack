@@ -4,6 +4,8 @@ import com.example.entity.Category;
 import com.example.mapper.CategoryMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -23,6 +25,7 @@ public class CategoryService {
      * 新增
      * @param category
      */
+    @CacheEvict(value = "categoryAll", allEntries = true)
     public void add(Category category) {
         categoryMapper.insert(category);
     }
@@ -31,6 +34,7 @@ public class CategoryService {
      * 删除
      * @param id
      */
+    @CacheEvict(value = "categoryAll", allEntries = true)
     public void deleteById(Integer id) {
         categoryMapper.deleteById(id);
     }
@@ -39,6 +43,7 @@ public class CategoryService {
      * 批量删除
      * @param ids
      */
+    @CacheEvict(value = "categoryAll", allEntries = true)
     public void deleteBatch(List<Integer> ids) {
         for (Integer id : ids) {
             categoryMapper.deleteById(id);
@@ -49,6 +54,7 @@ public class CategoryService {
      * 修改
      * @param category
      */
+    @CacheEvict(value = "categoryAll", allEntries = true)
     public void updateById(Category category) {
         categoryMapper.updateById(category);
     }
@@ -67,6 +73,7 @@ public class CategoryService {
      * @param category
      * @return
      */
+    @Cacheable(value = "categoryAll", key = "'all'", condition = "#category == null")
     public List<Category> selectAll(Category category) {
         return categoryMapper.selectAll(category);
     }

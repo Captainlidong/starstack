@@ -9,6 +9,8 @@ import com.example.mapper.UserMapper;
 import com.example.utils.TokenUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -45,6 +47,7 @@ public class ActivityService {
      * 新增
      * @param activity
      */
+    @CacheEvict(value = "activityTop", allEntries = true)
     public void add(Activity activity) {
         activityMapper.insert(activity);
         // 新活动上线：广播通知全部用户
@@ -63,6 +66,7 @@ public class ActivityService {
      * 删除
      * @param id
      */
+    @CacheEvict(value = "activityTop", allEntries = true)
     public void deleteById(Integer id) {
         activityMapper.deleteById(id);
     }
@@ -71,6 +75,7 @@ public class ActivityService {
      * 批量删除
      * @param ids
      */
+    @CacheEvict(value = "activityTop", allEntries = true)
     public void deleteBatch(List<Integer> ids) {
         for (Integer id : ids) {
             activityMapper.deleteById(id);
@@ -81,6 +86,7 @@ public class ActivityService {
      *  修改
      * @param activity
      */
+    @CacheEvict(value = "activityTop", allEntries = true)
     public void updateById(Activity activity) {
         activityMapper.updateById(activity);
     }
@@ -150,6 +156,7 @@ public class ActivityService {
     /**
      * 热门活动
      */
+    @Cacheable(value = "activityTop", key = "'all'")
     public List<Activity> selectTop() {
         List<Activity> activityList = this.selectAll(null);
         activityList= activityList.stream().sorted((b1, b2) -> b2.getReadCount().compareTo(b1.getReadCount()))

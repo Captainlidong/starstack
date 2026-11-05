@@ -58,7 +58,7 @@
           <notification-bell></notification-bell>
           <el-dropdown>
             <div class="front-header-dropdown">
-              <img :src="user.avatar" alt="">
+              <img :src="$thumb(user.avatar)" alt="">
               <div style="margin-left: 10px;color: #ffffff">
                 <span>{{ user.name || user.username }}</span><i class="el-icon-arrow-down" style="margin-left: 5px"></i>
               </div>

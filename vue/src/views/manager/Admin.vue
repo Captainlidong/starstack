@@ -23,7 +23,7 @@
           <template v-slot="scope">
             <div style="display: flex; align-items: center">
               <el-image style="width: 40px; height: 40px; border-radius: 50%" v-if="scope.row.avatar"
-                        :src="scope.row.avatar" :preview-src-list="[scope.row.avatar]"></el-image>
+                        :src="$thumb(scope.row.avatar)" :preview-src-list="[scope.row.avatar]"></el-image>
             </div>
           </template>
         </el-table-column>

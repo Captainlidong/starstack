@@ -5,6 +5,7 @@ import com.example.mapper.DashboardMapper;
 import com.example.mapper.ReportMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,6 +27,7 @@ public class DashboardService {
     @Resource
     private ReportMapper reportMapper;
 
+    @Cacheable(value = "dashboardStats", key = "'all'")
     public Map<String, Object> stats() {
         Map<String, Object> data = new HashMap<>();
         String today = DateUtil.today();

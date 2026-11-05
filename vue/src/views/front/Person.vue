@@ -55,7 +55,7 @@
         <div style="margin-top: 10px">
           <div class="card" v-for="q in receivedQuestions" :key="q.id" style="padding: 12px 18px; margin-bottom: 10px">
             <div style="display: flex; align-items: center; margin-bottom: 6px">
-              <img v-if="q.askerAvatar" :src="q.askerAvatar" style="width: 28px; height: 28px; border-radius: 50%; margin-right: 8px" />
+              <img v-if="q.askerAvatar" :src="$thumb(q.askerAvatar)" loading="lazy" style="width: 28px; height: 28px; border-radius: 50%; margin-right: 8px" />
               <span style="font-weight: bold">{{ q.askerName }}</span>
               <el-tag size="mini" :type="q.status === 'ANSWERED' ? 'success' : 'warning'" style="margin-left: 10px">
                 {{ q.status === 'ANSWERED' ? '已回答' : '待回答' }}

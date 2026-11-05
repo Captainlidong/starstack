@@ -35,7 +35,7 @@
         <div style="display: flex;align-items: center;margin-top: 4px">
           <div style="flex:1;font-size: 13px">
                 <span class="author-link" @click="goSpace(item.userId)">
-                  <img v-if="item.userAvatar" :src="item.userAvatar"
+                  <img v-if="item.userAvatar" :src="$thumb(item.userAvatar)" loading="lazy"
                        style="width: 20px;height: 20px;border-radius: 50%;margin-right: 4px;vertical-align: middle" />
                   <i v-else class="el-icon-user" style="margin-right: 3px"></i>{{ item.userName }}
                 </span>
@@ -60,7 +60,7 @@
 
       <!--封面-->
       <div class="blog-cover" style="width: 150px">
-        <img style="width: 100%;height:80px;border-radius: 5px" :src="item.cover" alt="">
+        <img style="width: 100%;height:80px;border-radius: 5px" :src="$thumb(item.cover)" loading="lazy" alt="">
       </div>
 
     </div>
