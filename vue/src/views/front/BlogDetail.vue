@@ -3,10 +3,10 @@
 <template>
   <div class="main-content">
 
-    <div style="display: flex; grid-gap: 10px">
+    <div class="detail-flex" style="display: flex; grid-gap: 10px">
 
       <!-- 左边 -->
-      <div style="flex: 1;width: 0">
+      <div class="detail-body-pad" style="flex: 1;width: 0">
         <div class="card" style="padding: 30px;margin-bottom: 10px">
           <div style="font-weight: bold;font-size: 24px;margin-bottom: 20px">
             {{blog.title}}
@@ -76,7 +76,7 @@
       </div>
 
       <!--右边-->
-      <div style="width: 260px">
+      <div class="detail-aside" style="width: 260px">
 
         <!--右边 -- 上边卡片-->
         <div class="card" style="margin-bottom: 10px">

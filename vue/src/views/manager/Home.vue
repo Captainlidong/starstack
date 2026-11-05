@@ -12,7 +12,7 @@
 
     <!-- 统计卡片 8 个 -->
     <el-row :gutter="10" style="margin-top: 10px">
-      <el-col :span="6" v-for="card in statCards" :key="card.title">
+      <el-col :span="6" :xs="12" :sm="12" v-for="card in statCards" :key="card.title">
         <div class="card stat-card" :class="{'stat-clickable': card.link}" @click="card.link && $router.push(card.link)">
           <div class="stat-icon" :style="{ background: card.color }">
             <i :class="card.icon"></i>
@@ -33,25 +33,25 @@
 
     <!-- 图表区 2×2 -->
     <el-row :gutter="10" style="margin-top: 10px">
-      <el-col :span="12">
+      <el-col :span="12" :xs="24" :sm="24" :md="12">
         <div class="card chart-card">
           <div class="chart-title">博客分类分布</div>
           <div ref="chartCategory" class="chart-box"></div>
         </div>
       </el-col>
-      <el-col :span="12">
+      <el-col :span="12" :xs="24" :sm="24" :md="12">
         <div class="card chart-card">
           <div class="chart-title">近 7 天发文与用户增长趋势</div>
           <div ref="chartTrend" class="chart-box"></div>
         </div>
       </el-col>
-      <el-col :span="12">
+      <el-col :span="12" :xs="24" :sm="24" :md="12">
         <div class="card chart-card">
           <div class="chart-title">博客状态分布</div>
           <div ref="chartStatus" class="chart-box"></div>
         </div>
       </el-col>
-      <el-col :span="12">
+      <el-col :span="12" :xs="24" :sm="24" :md="12">
         <div class="card chart-card">
           <div class="chart-title">热门博客 Top10（按浏览量）</div>
           <div ref="chartHot" class="chart-box"></div>
@@ -61,7 +61,7 @@
 
     <!-- 底部：待办 + 公告 -->
     <el-row :gutter="10" style="margin-top: 10px">
-      <el-col :span="8">
+      <el-col :span="8" :xs="24" :sm="12" :md="8">
         <div class="card todo-card">
           <div class="chart-title">最新待审核博客</div>
           <div v-for="b in latestPendingBlogs" :key="b.id" class="todo-item" @click="$router.push('/audit')">
@@ -71,7 +71,7 @@
           <div v-if="!latestPendingBlogs.length" class="todo-empty">🎉 暂无待审核内容</div>
         </div>
       </el-col>
-      <el-col :span="8">
+      <el-col :span="8" :xs="24" :sm="12" :md="8">
         <div class="card todo-card">
           <div class="chart-title">最新待处理举报</div>
           <div v-for="r in latestPendingReports" :key="r.id" class="todo-item" @click="$router.push('/report')">
@@ -81,7 +81,7 @@
           <div v-if="!latestPendingReports.length" class="todo-empty">🎉 暂无待处理举报</div>
         </div>
       </el-col>
-      <el-col :span="8">
+      <el-col :span="8" :xs="24" :sm="12" :md="8">
         <div class="card todo-card">
           <div class="chart-title">系统公告</div>
           <el-timeline reverse>

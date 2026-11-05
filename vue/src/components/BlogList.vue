@@ -59,7 +59,7 @@
       </div>
 
       <!--封面-->
-      <div style="width: 150px">
+      <div class="blog-cover" style="width: 150px">
         <img style="width: 100%;height:80px;border-radius: 5px" :src="item.cover" alt="">
       </div>
 

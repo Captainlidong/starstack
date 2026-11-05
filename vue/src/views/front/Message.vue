@@ -1,7 +1,7 @@
 <!--私信：左侧会话列表 + 右侧聊天窗（CSDN 消息中心式）-->
 <template>
   <div class="main-content">
-    <div class="card message-wrap" v-if="!guest">
+    <div class="card message-wrap" :class="{'mobile-chat': mobileChat}" v-if="!guest">
 
       <!-- 左：会话列表 -->
       <div class="conv-list">
@@ -28,7 +28,11 @@
       <!-- 右：聊天窗 -->
       <div class="chat-panel">
         <template v-if="activeId">
-          <div class="chat-head">{{ activeName }}</div>
+          <div class="chat-head">
+            <!-- 手机端返回会话列表（≤767px 显示） -->
+            <span class="mobile-back" @click="mobileChat = false"><i class="el-icon-back"></i></span>
+            {{ activeName }}
+          </div>
 
           <!-- 消息气泡列表 -->
           <div class="chat-body" ref="chatBody">
@@ -81,6 +85,7 @@ export default {
       adminMode: false,
       conversations: [],     // 会话列表
       activeId: this.$route.query.userId ? Number(this.$route.query.userId) : null,  // 当前聊天对象
+      mobileChat: false,     // 手机端切换态：true=显示聊天窗，false=显示会话列表（≤767px 生效）
       activeName: '',
       historyRaw: [],        // 聊天记录原始数据（接口倒序：最新在前）
       inputText: '',
@@ -165,6 +170,7 @@ export default {
     },
     openConversation(otherId) {
       this.activeId = otherId
+      this.mobileChat = true   // 手机端：点开会话切换到聊天窗
       const conv = this.conversations.find(c => c.otherId === otherId)
       this.activeName = conv ? conv.otherName : ''
       // 会话列表里还没有对方（首次发私信）时，单独取对方昵称

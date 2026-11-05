@@ -34,3 +34,23 @@ a {
     -webkit-line-clamp: 2; /* 超出几行省略 */
     overflow: hidden;
 }
+
+/* ============================================================
+   响应式全局适配（main.js 全局引入，前后台生效）
+   ============================================================ */
+/* 手机档：所有弹窗/抽屉不超出屏幕 */
+@media (max-width: 767px) {
+    .el-dialog {
+        width: 92% !important;          /* 覆盖组件 inline 的百分比宽度 */
+        margin-top: 6vh !important;
+    }
+    .el-dialog__body { padding: 14px 16px; }
+    .el-message-box { width: 88% !important; }
+}
+/* 手机档：登录/注册卡片放开为屏宽 */
+@media (max-width: 480px) {
+    .auth-card {
+        width: 92vw !important;
+        padding: 32px 20px !important;
+    }
+}

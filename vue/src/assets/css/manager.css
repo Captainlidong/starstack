@@ -177,3 +177,77 @@ th.el-table__cell {
     background-color: #f8f8f8 !important;
     color: #666;
 }
+
+/* ============================================================
+   后台响应式适配（≤991px 平板/手机：侧栏收进抽屉）
+   ============================================================ */
+
+/* 汉堡按钮：默认隐藏，≤991px 显示 */
+.manager-burger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin: 0 8px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    font-size: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.manager-burger:hover { background: rgba(255, 255, 255, 0.3); }
+
+/* 菜单抽屉里的 el-menu：Element 默认白底样式微调 */
+.manager-menu-drawer .el-menu {
+    border-right: none;
+}
+.manager-menu-drawer .el-menu-item.is-active {
+    background-color: #e6f4ff !important;
+    color: #1890ff !important;
+}
+.manager-menu-drawer .el-menu-item:hover {
+    background-color: #f5f5f5 !important;
+}
+
+@media (max-width: 991px) {
+    .manager-burger { display: flex; }
+    .manager-main-left { display: none; }        /* 固定侧栏收进抽屉 */
+    .manager-header-left { width: auto; padding-left: 10px; }
+    .manager-header-left .title { font-size: 15px; }
+    .manager-header-right { width: auto; padding-right: 10px; }
+    .manager-header-right .avatar > div { display: none; }   /* 只留头像 */
+
+    /* 搜索区：inline 流式改 flex 换行（!important 覆盖各表格页 inline 样式） */
+    .manager-main-right .search {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+    .manager-main-right .search .el-button { margin-left: 0 !important; }
+    .manager-main-right .search .el-input { width: 180px !important; }
+
+    /* 管理员信息/修改密码表单卡：窄屏放开宽度 */
+    .manager-main-right .el-card {
+        width: 100% !important;
+        max-width: 640px;
+    }
+
+    /* 表格卡片内边距收窄，给表格更多空间 */
+    .manager-main-right { padding: 6px; }
+    .manager-main-right .table { padding: 10px 6px; }
+
+    /* el-table 在 flex 容器中首次渲染可能未进入 scrollable-x 模式，
+       列总宽穿透溢出页面 —— 统一让表格容器自身横向滚动 */
+    .manager-main-right .el-table {
+        overflow-x: auto !important;
+        width: 100%;
+    }
+    /* 分页器内容超宽时自身滚动，避免穿透撑爆页面 */
+    .manager-main-right .pagination {
+        overflow-x: auto;
+    }
+}

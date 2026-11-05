@@ -1,7 +1,7 @@
 <template>
-  <div class="main-content" style="width: 65%">
+  <div class="main-content narrow-page" style="width: 65%">
     <div class="card" style="margin-bottom: 10px">
-      <div style="display: flex; grid-gap: 20px">
+      <div class="act-head" style="display: flex; grid-gap: 20px">
         <img :src="activity.cover" alt="" style="width: 30%; height: 250px; border-radius: 5px">
 
         <div style="flex: 1; position: relative">
@@ -14,8 +14,8 @@
             <el-tag style="margin-left: 5px" type="primary" size="mini">{{ activity.form }}</el-tag>
           </div>
 
-          <div style="position: absolute;bottom: 0;width: 100%">
-            <div style="display: flex; align-items: center">
+          <div class="act-actions" style="position: absolute;bottom: 0;width: 100%">
+            <div class="act-btn-row" style="display: flex; align-items: center">
               <div style="flex: 1">
                 <el-button type="primary" disabled v-if="activity.isEnd" key="已结束">已结束</el-button>
                 <el-button type="success"  v-else-if="activity.isSign" :key="signText" @click="cancel"

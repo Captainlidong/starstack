@@ -7,6 +7,11 @@
         <div class="title">星栈始动 · 后台</div>
       </div>
 
+      <!-- 手机/平板端汉堡按钮：打开侧边菜单抽屉（≤991px 显示） -->
+      <div class="manager-burger" @click="mobileMenuVisible = true">
+        <i class="el-icon-s-fold"></i>
+      </div>
+
       <div class="manager-header-center">
         <el-breadcrumb separator-class="el-icon-arrow-right">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -75,6 +80,44 @@
       </div>
     </div>
 
+    <!-- 手机/平板端侧边菜单抽屉（≤991px 替代固定侧栏） -->
+    <el-drawer title="后台菜单" :visible.sync="mobileMenuVisible" size="220px"
+               class="manager-menu-drawer" :append-to-body="true">
+      <el-menu :default-openeds="['info', 'user']" router :default-active="$route.path"
+               @select="mobileMenuVisible = false">
+        <el-menu-item index="/home">
+          <i class="el-icon-s-data"></i>
+          <span slot="title">数据仪表盘</span>
+        </el-menu-item>
+        <el-submenu index="info">
+          <template slot="title">
+            <i class="el-icon-menu"></i><span>信息管理</span>
+          </template>
+          <el-menu-item index="/category">IT博客分类</el-menu-item>
+          <el-menu-item index="/blog">IT博客信息</el-menu-item>
+          <el-menu-item index="/activity">活动信息</el-menu-item>
+          <el-menu-item index="/activitySign">活动报名信息</el-menu-item>
+          <el-menu-item index="/comment">评论信息</el-menu-item>
+          <el-menu-item index="/notice">公告信息</el-menu-item>
+        </el-submenu>
+        <el-submenu index="safe">
+          <template slot="title">
+            <i class="el-icon-s-check"></i><span>内容安全</span>
+          </template>
+          <el-menu-item index="/audit">内容审核</el-menu-item>
+          <el-menu-item index="/report">举报处理</el-menu-item>
+          <el-menu-item index="/sensitiveWord">敏感词管理</el-menu-item>
+        </el-submenu>
+        <el-submenu index="user">
+          <template slot="title">
+            <i class="el-icon-menu"></i><span>用户管理</span>
+          </template>
+          <el-menu-item index="/admin">管理员信息</el-menu-item>
+          <el-menu-item index="/user">用户信息</el-menu-item>
+        </el-submenu>
+      </el-menu>
+    </el-drawer>
+
   </div>
 </template>
 
@@ -84,6 +127,7 @@ export default {
   data() {
     return {
       user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
+      mobileMenuVisible: false,   // 手机/平板端侧边菜单抽屉（≤991px）
     }
   },
   created() {

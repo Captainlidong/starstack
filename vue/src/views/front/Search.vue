@@ -1,5 +1,5 @@
 <template>
-  <div style="margin: 5px auto; width: 60%">
+  <div class="narrow-page" style="margin: 5px auto; width: 60%">
     <BlogList/>
   </div>
 </template>

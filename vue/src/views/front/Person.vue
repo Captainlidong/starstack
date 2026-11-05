@@ -1,5 +1,5 @@
 <template>
-  <div class="main-content" style="width: 50%">
+  <div class="main-content narrow-page" style="width: 50%">
     <el-tabs v-if="!guest" v-model="activeName" @tab-click="clickTabs">
       <el-tab-pane label="我发表的博客" name="我发表的博客">
         <div class="card" style="padding: 5px"><el-button type="primary" @click="addBlog">发表新博客</el-button></div>

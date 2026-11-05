@@ -1,6 +1,6 @@
 <!--向作者提问（一问一答制）-->
 <template>
-  <div style="width: 60%; margin: 5px auto">
+  <div class="narrow-page" style="width: 60%; margin: 5px auto">
     <div class="card" style="margin-bottom: 100px" v-if="!guest">
       <div style="font-weight: bold; font-size: 24px; margin-bottom: 20px">向 TA 提问</div>
 

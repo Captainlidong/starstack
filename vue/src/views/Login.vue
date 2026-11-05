@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="login-card" style="width: 380px; padding: 45px;">
+    <div class="login-card auth-card" style="width: 380px; padding: 45px;">
       <div style="text-align: center; font-size: 24px; margin-bottom: 6px; color: #6b5b95; font-weight: bold">星栈始动</div>
       <div style="text-align: center; font-size: 12px; margin-bottom: 26px; color: #b9a7e0; letter-spacing: 2px">StarStack BootUp · IT 技术交流社区</div>
       <el-form :model="form" :rules="rules" ref="formRef">

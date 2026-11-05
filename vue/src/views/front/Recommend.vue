@@ -48,7 +48,7 @@
       </div>
 
       <!-- 封面图 -->
-      <div style="width: 150px">
+      <div class="blog-cover" style="width: 150px">
         <img :src="item.cover" alt="" style="width: 100%; height: 80px; border-radius: 5px;" />
       </div>
 

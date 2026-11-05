@@ -19,10 +19,10 @@
       </div>
     </div>
 
-    <div style="display: flex;align-items: flex-start;grid-gap: 10px">
+    <div class="home-flex" style="display: flex;align-items: flex-start;grid-gap: 10px">
 
       <!--中间博客展示模块-->
-      <div style="flex: 1">
+      <div style="flex: 1;min-width: 0">
 
         <BlogList :categoryName="current"/>
 
@@ -31,7 +31,7 @@
       </div>
 
       <!--右边-->
-      <div style="width: 260px">
+      <div class="home-aside" style="width: 260px">
         <div class="card" style="margin-bottom: 10px">
           <div style="font-size: 20px;font-weight: bold;margin-bottom: 10px">
             欢迎您！😊

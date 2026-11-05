@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row :gutter="10" v-if="total">
-      <el-col :span="span" v-for="item in tableData" :key="item.id">
+      <el-col :span="span" :xs="24" :sm="12" v-for="item in tableData" :key="item.id">
         <div class="card" style="margin-bottom: 10px" @click="goDetail(item.id)">
           <img :src="item.cover" alt="" style="width: 100%; height: 150px; border-radius: 5px">
           <div style="margin: 12px 0 8px; font-weight: bold">{{ item.name }}</div>

@@ -7,7 +7,7 @@
 
 /* ---------- 全局画布：梦幻渐变 ---------- */
 body {
-    min-width: 1240px;   /* 头部元素较宽，窄窗口下出横向滚动而不是挤压换行 */
+    /* 响应式改造：不再强制 1240px 最小宽度，窄窗口由媒体查询逐档适配 */
     background: linear-gradient(160deg, #c9b8f9 0%, #e3c7f7 22%, #ffd7ee 48%, #ffeaf5 66%, #c8f3e2 100%) fixed;
 }
 
@@ -73,6 +73,10 @@ body {
     flex-shrink: 0;
     display: flex;
     align-items: center;
+}
+.front-search-input {
+    width: 260px;
+    margin-right: 10px;
 }
 .front-header-dropdown {
     display: flex;
@@ -172,6 +176,7 @@ body {
 }
 .main-content {
     width: 80%;
+    max-width: 1400px;   /* 大屏防拉伸 */
     margin: 5px auto;
 }
 
@@ -531,4 +536,153 @@ body {
 }
 .pink-dialog .el-dialog__footer .el-button--primary:hover {
     opacity: .88;
+}
+
+/* ============================================================
+   响应式适配（断点对齐 Element UI：xs<768 / sm 768-991 / md 992-1199）
+   大屏（≥1200px）维持原设计不变
+   ============================================================ */
+
+/* ---------- 汉堡按钮：默认隐藏，手机档显示 ---------- */
+.front-burger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    margin-left: 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.88);
+    color: #8b5cf6;
+    font-size: 22px;
+    cursor: pointer;
+    flex-shrink: 0;
+    align-self: center;
+    line-height: 1;
+}
+
+/* 手机端导航抽屉：粉紫胶囊菜单项 */
+.mobile-nav-drawer .mobile-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 13px 16px;
+    margin-bottom: 6px;
+    border-radius: 12px;
+    color: #4b4b4b;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all .2s;
+}
+.mobile-nav-drawer .mobile-nav-item i { margin-right: 10px; font-size: 17px; color: #8b5cf6; }
+.mobile-nav-drawer .mobile-nav-item:hover { background: #f7f3ff; color: #e8619c; }
+.mobile-nav-drawer .mobile-nav-item.active {
+    background: linear-gradient(135deg, #b79cff, #ff9ecf);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(255, 158, 207, 0.4);
+}
+.mobile-nav-drawer .mobile-nav-item.active i { color: #ffffff; }
+
+/* 私信页手机端返回按钮：默认隐藏 */
+.mobile-back {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background: #f3e8ff;
+    color: #8b5cf6;
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+/* ---------- 小笔记本档（≤1199px）：头部收窄 ---------- */
+@media (max-width: 1199px) {
+    .front-header-left { width: auto; padding-left: 16px; }
+    .front-header-left img { height: 40px; }
+    .front-header-left .title { font-size: 16px; margin-left: 6px; }
+    .front-header-sub { display: none; }
+    .front-search-input { width: 160px !important; margin-right: 10px; }
+    .main-content { width: 92%; }
+}
+
+/* ---------- 平板档（≤991px）：双栏堆叠、定宽页放开、头部折叠进抽屉 ---------- */
+@media (max-width: 991px) {
+    .home-flex { flex-direction: column !important; }
+    .home-aside { width: 100% !important; }
+    .detail-flex { flex-direction: column !important; }
+    .detail-aside { width: 100% !important; }
+    .narrow-page { width: 92% !important; }
+    .front-header { margin: 8px 10px 0; }
+    .main-body { padding: 6px 10px 20px; }
+    /* 768px 宽下菜单+搜索+用户区仍装不下：导航整体折叠进汉堡抽屉 */
+    .front-header-center { display: none; }
+    .front-header-search { display: none; }
+    .front-burger { display: flex; }
+}
+
+/* ---------- 手机档（≤767px）：单列 + 折叠导航 + 组件收纳 ---------- */
+@media (max-width: 767px) {
+    .front-header {
+        height: 54px;
+        line-height: 54px;
+        margin: 8px 8px 0;
+        border-radius: 14px;
+    }
+    .front-header-left { padding-left: 12px; }
+    .front-header-left img { height: 34px; }
+    .front-header-left .title { font-size: 15px; }
+    .front-header-right { padding-right: 10px; }
+    .front-header-right .el-button + .el-button { margin-left: 6px; }
+    .notice-bell { margin: 0 10px; }                  /* 铃铛间距收窄 */
+    .front-burger { display: flex; }
+    .main-content { width: auto; margin: 5px 6px; }
+    .main-body { padding: 4px 6px 14px; }
+    .main-body .card { border-radius: 12px; }
+
+    /* 博客卡片：封面缩小、间距收窄 */
+    .main-body .blog-box { padding: 12px 12px; }
+    .blog-cover { width: 110px !important; }
+
+    /* 博客详情：工具栏改底部横条（scoped 样式后加载，关键属性需 !important 覆盖） */
+    .detail-toolbar {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0;
+        right: 0;
+        width: 100% !important;
+        flex-direction: row !important;
+        justify-content: space-around;
+        padding: 8px 0;
+        background: rgba(255, 255, 255, 0.92) !important;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 -4px 16px rgba(160, 120, 220, 0.18);
+        border-radius: 0;
+    }
+    .detail-toolbar .tool-item { width: 42px; height: 42px; margin-bottom: 0; font-size: 18px; }
+    .detail-body-pad { padding-bottom: 70px !important; }
+
+    /* 私信：列表↔聊天切换模式（mobileChat 状态由 Message.vue 控制）
+       !important：组件 scoped 样式（.chat-panel display:flex）后加载，需更高优先级覆盖 */
+    .message-wrap { height: calc(100vh - 110px) !important; min-height: 380px; }
+    .message-wrap .conv-list { width: 100% !important; border-right: none; }
+    .message-wrap .chat-panel { display: none !important; }
+    .message-wrap.mobile-chat .conv-list { display: none !important; }
+    .message-wrap.mobile-chat .chat-panel { display: flex !important; }
+    .message-wrap.mobile-chat .mobile-back { display: flex; }
+
+    /* 活动详情：封面堆叠、按钮区回流换行 */
+    .act-head { flex-direction: column !important; }
+    .act-head > img { width: 100% !important; height: auto !important; max-height: 180px; }
+    .act-actions { position: static !important; margin-top: 14px; }
+    .act-btn-row { flex-wrap: wrap !important; grid-gap: 8px; }
+    .act-btn-row > div { text-align: left !important; }
+    .act-btn-row .el-button { margin-left: 0 !important; padding: 9px 12px; }
+
+    /* 空间页头部：头像/统计/操作窄屏换行（el-tabs 自带滑动可保持） */
+    .space-header { flex-wrap: wrap !important; }
 }

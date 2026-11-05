@@ -22,9 +22,15 @@
         <img src="@/assets/imgs/logo.png" alt="">
         <div style="line-height: 1.2; margin-top: 6px">
           <div class="title" style="line-height: 1.3">星栈始动</div>
-          <div style="font-size: 11px;color: rgba(255,255,255,.85);margin-top: 2px;letter-spacing: 1px;line-height: 1.2"> StarStack BootUp</div>
+          <div class="front-header-sub" style="font-size: 11px;color: rgba(255,255,255,.85);margin-top: 2px;letter-spacing: 1px;line-height: 1.2"> StarStack BootUp</div>
         </div>
       </div>
+
+      <!-- 手机端汉堡导航按钮（≤767px 显示，桌面隐藏） -->
+      <div class="front-burger" @click="mobileNavVisible = true">
+        <i class="el-icon-s-fold"></i>
+      </div>
+
       <div class="front-header-center">
         <div class="front-header-nav">
           <el-menu :default-active="$route.path" mode="horizontal" router>
@@ -38,7 +44,7 @@
 
       <!--搜索框-->
       <div class="front-header-search">
-        <el-input placeholder="请输入关键字搜索" style="width: 260px; margin-right: 10px" v-model="title" class="input-with-select" clearable></el-input>
+        <el-input placeholder="请输入关键字搜索" class="front-search-input" v-model="title" clearable @keyup.enter.native="goSearch"></el-input>
         <el-button type="success" icon="el-icon-search" @click="goSearch">搜 索</el-button>
       </div>
 
@@ -72,6 +78,27 @@
         </div>
       </div>
     </div>
+    <!-- 手机端导航抽屉（≤767px 时替代顶部水平菜单） -->
+    <el-drawer title="星栈始动" :visible.sync="mobileNavVisible" size="240px"
+               class="mobile-nav-drawer" :append-to-body="true">
+      <div style="padding: 0 16px">
+        <div class="mobile-nav-item" :class="{active: $route.path === '/front/home'}" @click="goMobileNav('/front/home')">
+          <i class="el-icon-s-home"></i> 首页
+        </div>
+        <div class="mobile-nav-item" :class="{active: $route.path === '/front/recommend'}" @click="goMobileNav('/front/recommend')">
+          <i class="el-icon-star-off"></i> IT博客推荐
+        </div>
+        <div class="mobile-nav-item" :class="{active: $route.path === '/front/activity'}" @click="goMobileNav('/front/activity')">
+          <i class="el-icon-calendar"></i> 活动中心
+        </div>
+        <div class="mobile-nav-item" :class="{active: $route.path === '/front/person'}" @click="goMobileNav('/front/person')">
+          <i class="el-icon-user"></i> 个人中心
+        </div>
+        <el-divider></el-divider>
+        <el-input placeholder="请输入关键字搜索" v-model="title" clearable @keyup.enter.native="goSearch"></el-input>
+        <el-button type="success" icon="el-icon-search" round style="width: 100%; margin-top: 10px" @click="goSearch">搜 索</el-button>
+      </div>
+    </el-drawer>
     <!--主体-->
     <div class="main-body">
       <router-view ref="child" @update:user="updateUser" />
@@ -91,6 +118,7 @@ export default {
     return {
       latestNotice: null,        // 最新一条公告（登录弹窗数据源）
       noticeDialogVisible: false,
+      mobileNavVisible: false,   // 手机端导航抽屉（≤767px）
       user: JSON.parse(localStorage.getItem("xm-user") || '{}'),
       title:this.$route.query.title
     }
@@ -107,7 +135,13 @@ export default {
   },
   methods: {
     goSearch(){
+      this.mobileNavVisible = false
       location.href='/front/search?title=' + this.title
+    },
+    // 手机端抽屉导航跳转：路由跳转后关闭抽屉
+    goMobileNav(path){
+      this.mobileNavVisible = false
+      if (this.$route.path !== path) this.$router.push(path)
     },
     loadNotice() {
       this.$request.get('/notice/selectAll').then(res => {

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="login-card" style="width: 380px; padding:50px 30px;">
+    <div class="login-card auth-card" style="width: 380px; padding:50px 30px;">
       <div style="text-align: center; font-size: 24px; margin-bottom: 30px; color: #6b5b95">欢迎注册 星栈始动 账号</div>
       <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item prop="username">

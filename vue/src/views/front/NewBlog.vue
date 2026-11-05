@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 50%;margin: 5px auto">
+  <div class="narrow-page" style="width: 50%;margin: 5px auto">
     <div class="card" style="margin-bottom: 100px" v-if="!guest">
       <div style="font-weight: bold;font-size: 24px;margin-bottom: 20px">发表新博客/编辑博客</div>
       <el-alert v-if="form.status==='REJECTED'" type="error" :closable="false" show-icon style="margin-bottom: 20px"

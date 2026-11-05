@@ -5,7 +5,7 @@
     </el-badge>
 
     <!-- append-to-body：抽屉挂到 body 层，避免被头部毛玻璃效果的定位上下文影响导致页面假死 -->
-    <el-drawer title="消息通知" :visible.sync="drawer" size="380px" :append-to-body="true">
+    <el-drawer title="消息通知" :visible.sync="drawer" :size="drawerSize" :append-to-body="true">
       <div style="padding: 0 15px 20px">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px">
           <el-button type="text" size="mini" @click="$router.push('/front/message')">
@@ -55,6 +55,10 @@ export default {
   computed: {
     isLogged() {
       return !!this.user.id
+    },
+    // 抽屉宽度：小屏用屏宽比例，避免 380px 超出
+    drawerSize() {
+      return window.innerWidth < 480 ? '88%' : '380px'
     }
   },
   watch: {
