@@ -36,6 +36,12 @@
 |:---:|:---:|
 | ![数据仪表盘](docs/screenshots/05-admin-dashboard.png) | ![敏感词管理](docs/screenshots/06-sensitive-word.png) |
 
+## 📚 文档
+
+- [架构设计文档](docs/ARCHITECTURE.md) —— 整体架构、数据模型与关键设计（审核状态机 / WebSocket 推送 / 图片三级缓存 / 协同过滤 / 安全设计）
+- [API 接口文档](docs/API.md) —— 全量端点清单、统一返回结构与错误码表、限流策略
+- [贡献指南](CONTRIBUTING.md) —— 环境搭建、提交规范与代码安全规约
+
 ## 🛠 技术栈
 
 | 端 | 技术 |
