@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    name: 后端构建（Spring Boot / JDK 8）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+          cache: maven
+      # pom 中阿里云仓库为 http，Maven 3.8+ 默认 blocker 会拦截——统一镜像到 https Central
+      - name: Configure Maven Central mirror
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<'EOF'
+          <settings>
+            <mirrors>
+              <mirror>
+                <id>central-https</id>
+                <mirrorOf>*</mirrorOf>
+                <url>https://repo.maven.apache.org/maven2</url>
+              </mirror>
+            </mirrors>
+          </settings>
+          EOF
+      - name: Build backend
+        working-directory: springboot
+        run: mvn -B package -DskipTests
+
+  frontend:
+    name: 前端构建（Vue 2 / vue-cli 5）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: npm
+          cache-dependency-path: vue/package-lock.json
+      - name: Install dependencies
+        working-directory: vue
+        run: npm ci
+      - name: Build frontend
+        working-directory: vue
+        run: npm run build

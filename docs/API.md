@@ -75,7 +75,7 @@ Base URL：`http://<host>:9090`（前后端同源部署）。
 | 动词 | 路径 | 功能 | 权限 |
 |---|---|---|---|
 | GET | /selectAll | 全部分类 | 公开 |
-| POST /add、PUT /update、DELETE /delete/{id}、/delete/batch | | 增删改 | 登录 |
+| POST /add、PUT /update、DELETE /delete/{id}、/delete/batch | | 增删改 | ADMIN |
 | GET | /selectById/{id}、/selectPage | 查询 | 登录 |
 
 ## 4. 活动（/activity /activitySign）
@@ -84,10 +84,10 @@ Base URL：`http://<host>:9090`（前后端同源部署）。
 |---|---|---|---|
 | GET | /selectPage /selectAll /selectById/{id} /selectTop | 活动查询 | 公开 |
 | PUT | /updateReadCount/{activityId} | 阅读量+1 | 公开 |
-| POST /add、PUT /update、DELETE /delete/{id}、/delete/batch | | 活动增删改（content 富文本） | 登录 |
+| POST /add、PUT /update、DELETE /delete/{id}、/delete/batch | | 活动增删改（content 富文本） | ADMIN |
 | POST | /activitySign/add | 报名（重复报名 5006） | 登录 |
 | DELETE | /activitySign/delete/user/{activityId}/{userId} | 取消报名 | 登录 |
-| GET | /activitySign/selectPage | 报名记录分页 | 登录 |
+| GET | /activitySign/selectPage | 报名记录分页 | ADMIN |
 | GET | /selectUser /selectUserLike /selectUserCollect /selectUserComment | 个人维度查询 | 登录 |
 
 ## 5. 评论（/comment）
@@ -160,11 +160,20 @@ Base URL：`http://<host>:9090`（前后端同源部署）。
 | 动词 | 路径 | 功能 | 权限 |
 |---|---|---|---|
 | GET | /notice/selectAll /selectPage /selectById/{id} | 公告查询（登录弹窗数据源） | 公开 |
-| POST/PUT/DELETE | /notice/add /update /delete/{id} | 公告维护（推送即触发全员弹窗） | 登录 |
+| POST/PUT/DELETE | /notice/add /update /delete/{id} | 公告维护（推送即触发全员弹窗） | ADMIN |
 | GET | /dashboard/stats | 仪表盘统计（卡片+图表+待办，30s 缓存） | ADMIN |
 | GET/POST/DELETE | /sensitiveWord/selectPage /add /delete/{id} | 敏感词管理（内存缓存即时生效） | ADMIN |
-| CRUD | /admin/*、/user/* | 账号管理（查询脱敏密码） | 登录 |
+| CRUD | /admin/*、/user/* | 账号管理（查询脱敏密码） | ADMIN（/user/update 仅本人或 ADMIN） |
 
+
+## 管理接口 ADMIN 拦截
+
+`AdminInterceptor` 对管理端专属路径统一校验 ADMIN 角色（非 ADMIN 返回 403）：
+`/admin/**`、`/user/add|delete|selectPage|selectAll|selectById`、
+`/category`、`/activity`、`/notice` 的增删改、`/activitySign/delete/{id}|delete/batch|selectPage`。
+
+**例外**：`/user/update` 校验「本人或 ADMIN」；`/activitySign/add` 与 `/activitySign/delete/user/**`
+为前台报名/取消报名（登录即可）；`dashboard/sensitiveWord/report/audit/setTop` 已有代码级校验。
 ## 13. 文件（/files）
 
 | 动词 | 路径 | 功能 | 权限 |
@@ -173,4 +182,4 @@ Base URL：`http://<host>:9090`（前后端同源部署）。
 | POST | /editor/upload | wangEditor 上传 `{errno:0, data:[{url}]}` | 公开+限流 |
 | GET | /{flag} | 原图流式输出（immutable 一年缓存） | 公开 |
 | GET | /thumb/{flag} | 缩略图懒生成（WebP 三级缓存） | 公开 |
-| DELETE | /{flag} | 删除原图并联动清理缩略图 | 公开（风险点：无鉴权，部署建议收紧） |
+| DELETE | /{flag} | 删除原图并联动清理缩略图（目录穿越防护） | ADMIN |

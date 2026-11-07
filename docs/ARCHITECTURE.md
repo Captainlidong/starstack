@@ -87,6 +87,7 @@ DRAFT --提交--> PENDING --审核通过--> PUBLISHED
 - 登录签发 JWT（HS256），**签名密钥 = 用户当前密码哈希**——修改密码即强制全端下线；aud 载荷 `id-ROLE`，2 小时时效
 - JwtInterceptor `/**` 拦截 + 白名单放行（登录/注册/验证码/游客只读接口清单见 WebConfig）
 - 代码层二次角色校验：USER 专属（发布/评论/点赞）、ADMIN 专属（审核/仪表盘/敏感词）
+- **AdminInterceptor**：对 /admin/**、用户/分类/活动/公告/报名记录的管理端接口统一 ADMIN 校验（非 ADMIN 403）；/user/update 校验「本人或 ADMIN」防水平越权；DELETE /files 防目录穿越 + ADMIN 收紧
 
 ### 5.3 私信 WebSocket 实时推送
 ```
