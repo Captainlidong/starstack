@@ -22,4 +22,7 @@ public interface FollowMapper {
     int countFans(Integer userId);
 
     int countFollowing(Integer userId);
+
+    @org.apache.ibatis.annotations.Delete("delete from follow where user_id = #{userId} or follower_id = #{userId}")
+    void deleteByUser(Integer userId);
 }

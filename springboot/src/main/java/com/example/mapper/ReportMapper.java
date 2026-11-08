@@ -17,4 +17,7 @@ public interface ReportMapper {
     Report selectById(Integer id);
 
     void updateById(Report report);
+
+    @org.apache.ibatis.annotations.Delete("delete from report where reporter_id = #{userId}")
+    void deleteByUserId(Integer userId);
 }

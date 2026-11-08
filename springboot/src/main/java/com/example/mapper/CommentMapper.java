@@ -47,4 +47,11 @@ public interface CommentMapper {
      */
     @Select("select count(*) from comment where fid = #{fid} and module = #{module}")
     Integer selectCount(@Param("fid") Integer fid, @Param("module") String module);
+
+    @org.apache.ibatis.annotations.Delete("delete from comment where user_id = #{userId}")
+    void deleteByUserId(Integer userId);
+
+    /** 用户所发博客下的全部评论（删用户时级联清理） */
+    @org.apache.ibatis.annotations.Delete("delete from comment where module = 'BLOG' and fid in (select id from blog where user_id = #{userId})")
+    void deleteByBlogAuthor(Integer userId);
 }

@@ -16,4 +16,7 @@ public interface NotificationMapper {
     void readAll(Integer userId);
 
     Notification selectById(Integer id);
+
+    @org.apache.ibatis.annotations.Delete("delete from notification where user_id = #{userId}")
+    void deleteByUserId(Integer userId);
 }

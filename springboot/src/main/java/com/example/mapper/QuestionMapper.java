@@ -16,4 +16,7 @@ public interface QuestionMapper {
     void updateAnswer(Question question);
 
     Question selectById(Integer id);
+
+    @org.apache.ibatis.annotations.Delete("delete from question where asker_id = #{userId} or author_id = #{userId}")
+    void deleteByUser(Integer userId);
 }

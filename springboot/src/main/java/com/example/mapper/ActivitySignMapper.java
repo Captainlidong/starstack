@@ -27,4 +27,7 @@ public interface ActivitySignMapper {
 
     @Delete("delete from activity_sign where activity_id = #{activityId} and user_id = #{userId}")
     void userDelete(@Param("activityId") Integer activityId, @Param("userId") Integer useId);
+
+    @org.apache.ibatis.annotations.Delete("delete from activity_sign where user_id = #{userId}")
+    void deleteByUserId(Integer userId);
 }

@@ -21,4 +21,11 @@ public interface UserBehaviorMapper {
     void deleteBehavior(@Param("userId") Integer userId,
                         @Param("blogId") Integer blogId,
                         @Param("behaviorType") Byte behaviorType);
+
+    @org.apache.ibatis.annotations.Delete("delete from user_behavior where user_id = #{userId}")
+    void deleteByUserId(Integer userId);
+
+    /** 他人对所删用户博客产生的行为记录（blog_id 外键需在删博客前清理） */
+    @org.apache.ibatis.annotations.Delete("delete from user_behavior where blog_id in (select id from blog where user_id = #{userId})")
+    void deleteByBlogAuthor(Integer userId);
 }

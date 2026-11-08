@@ -10,6 +10,17 @@ import com.example.entity.Account;
 import com.example.entity.Admin;
 import com.example.entity.User;
 import com.example.exception.CustomException;
+import com.example.mapper.BlogMapper;
+import com.example.mapper.CommentMapper;
+import com.example.mapper.LikesMapper;
+import com.example.mapper.CollectMapper;
+import com.example.mapper.FollowMapper;
+import com.example.mapper.MessageMapper;
+import com.example.mapper.NotificationMapper;
+import com.example.mapper.UserBehaviorMapper;
+import com.example.mapper.ActivitySignMapper;
+import com.example.mapper.QuestionMapper;
+import com.example.mapper.ReportMapper;
 import com.example.mapper.UserMapper;
 import com.example.utils.PasswordUtils;
 import com.example.utils.TokenUtils;
@@ -18,6 +29,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.swing.*;
@@ -30,8 +42,33 @@ import java.util.List;
  */
 @Service
 public class UserService {
+
+    @Resource
+    private XssCleanService xssCleanService;
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private BlogMapper blogMapper;
+    @Resource
+    private CommentMapper commentMapper;
+    @Resource
+    private LikesMapper likesMapper;
+    @Resource
+    private CollectMapper collectMapper;
+    @Resource
+    private FollowMapper followMapper;
+    @Resource
+    private MessageMapper messageMapper;
+    @Resource
+    private NotificationMapper notificationMapper;
+    @Resource
+    private UserBehaviorMapper userBehaviorMapper;
+    @Resource
+    private ActivitySignMapper activitySignMapper;
+    @Resource
+    private QuestionMapper questionMapper;
+    @Resource
+    private ReportMapper reportMapper;
 
     public void register(Account account) {
         User user=new User();
@@ -44,7 +81,9 @@ public class UserService {
      * @param user
      */
     public void add(User user){
-        //业务方法
+        // XSS 净化
+        user.setName(xssCleanService.escapeText(user.getName()));
+        user.setInfo(xssCleanService.escapeText(user.getInfo()));        //业务方法
         //1.判断用户账号是否重复
         User dbUser = userMapper.selectByUserName(user.getUsername());
         if (dbUser!= null){
@@ -84,7 +123,34 @@ public class UserService {
      * 删除
      * @param id
      */
+    /**
+     * 删除用户：事务内清理全部关联数据，避免外键拒绝与孤儿数据
+     * 注意顺序：user_behavior 同时外键引用 user 与 blog，必须最先删
+     */
+    @Transactional
     public void deleteById(Integer id) {
+        // 1. 行为记录（user_behavior 外键同时引用 user 与 blog，必须最先删）
+        userBehaviorMapper.deleteByUserId(id);
+        userBehaviorMapper.deleteByBlogAuthor(id);   // 他人对该用户博客的行为（fk_blog）
+        // 2. 用户所发博客收到的互动（评论/点赞/收藏，按博客 fid 级联清理）
+        commentMapper.deleteByBlogAuthor(id);
+        likesMapper.deleteByBlogAuthor(id);
+        collectMapper.deleteByBlogAuthor(id);
+        // 3. 用户所发的博客
+        blogMapper.deleteByUserId(id);
+        // 4. 用户在各内容下的互动
+        commentMapper.deleteByUserId(id);
+        likesMapper.deleteByUserId(id);
+        collectMapper.deleteByUserId(id);
+        // 5. 社交与通知
+        followMapper.deleteByUser(id);
+        messageMapper.deleteByUser(id);
+        notificationMapper.deleteByUserId(id);
+        // 6. 报名/问答/举报
+        activitySignMapper.deleteByUserId(id);
+        questionMapper.deleteByUser(id);
+        reportMapper.deleteByUserId(id);
+        // 7. 用户本体（外键引用方已全部清理）
         userMapper.deleteById(id);
     }
 
@@ -92,6 +158,7 @@ public class UserService {
      * 批量删除
      * @param ids
      */
+    @Transactional
     public void deleteBatch(List<Integer> ids) {
         for (Integer id : ids) {
             this.deleteById(id);
@@ -103,7 +170,9 @@ public class UserService {
      * @param user
      */
     public void updateById(User user) {
-        //提交了密码时强制哈希，防止异常客户端把明文写入数据库
+        // XSS 净化
+        user.setName(xssCleanService.escapeText(user.getName()));
+        user.setInfo(xssCleanService.escapeText(user.getInfo()));        //提交了密码时强制哈希，防止异常客户端把明文写入数据库
         if (ObjectUtil.isNotEmpty(user.getPassword())) {
             user.setPassword(PasswordUtils.hash(user.getPassword()));
         }

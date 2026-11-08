@@ -105,4 +105,7 @@ public interface BlogMapper {
 
     /** 个人空间：用户公开已发布的博客（按日期倒序） */
     List<Blog> selectSpaceBlogs(Integer userId);
+
+    @org.apache.ibatis.annotations.Delete("delete from blog where user_id = #{userId}")
+    void deleteByUserId(Integer userId);
 }

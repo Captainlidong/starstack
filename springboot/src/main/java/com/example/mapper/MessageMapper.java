@@ -22,4 +22,7 @@ public interface MessageMapper {
     List<Map<String, Object>> selectConversationPairs(@Param("me") Integer me);
 
     Message selectById(Integer id);
+
+    @org.apache.ibatis.annotations.Delete("delete from message where sender_id = #{userId} or receiver_id = #{userId}")
+    void deleteByUser(Integer userId);
 }
